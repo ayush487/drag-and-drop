@@ -22,6 +22,7 @@ let listArrays = []
 // Drag Functionality
 let draggedItem;
 let currentColumn;
+let dragging = false
 
 // Get Arrays from localStorage if available, set default values if not
 function getSavedColumns() {
@@ -110,10 +111,14 @@ const updateItem = (id, column) => {
   const selectedArray = listArrays[column]
   
   const selectedColumnEl = listColumns[column].children
-  if(!selectedColumnEl[id].textContent) {
-    delete selectedArray[id]
+  if(!dragging) {
+    if(!selectedColumnEl[id].textContent) {
+      delete selectedArray[id]
+    }else {
+      selectedArray[id] = selectedColumnEl[id].textContent
+    }
+    updateDOM()
   }
-  updateDOM()
 }
 
 // Add to Column List, Reset Textbox
@@ -165,6 +170,7 @@ const rebuildArrays = () => {
 // When Item Starts Dragging
 const drag = (e) => {
   draggedItem = e.target
+  dragging = true
 }
 
 // When Ittem Enters Column
@@ -193,6 +199,8 @@ const drop = (e) => {
   // Add Item to Column
   const parent = listColumns[currentColumn]
   parent.appendChild(draggedItem)
+  // Dragging Complete
+  dragging = false
   rebuildArrays()
 }
 
