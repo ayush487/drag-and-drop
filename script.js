@@ -47,12 +47,14 @@ function updateSavedColumns() {
   })
 }
 
+// Filter Arrays to remove empty items
+const filterArrays = (array) => {
+  const filteredArray = array.filter(item => item !== null)
+  return filteredArray
+}
+
 // Create DOM Elements for each list item
 function createItemEl(columnEl, column, item, index) {
-  // console.log('item: ', item)
-  // console.log('column: ', column)
-  // console.log('ColumnEl: ', columnEl)
-  // console.log('index: ', index)
   // List Item
   const listEl = document.createElement('li');
   listEl.classList.add('drag-item');
@@ -78,25 +80,25 @@ function updateDOM() {
   backlogListArray.forEach((backlogItem, index) => {
     createItemEl(backlogList, 0, backlogItem, index)
   })
-
+  backlogListArray = filterArrays(backlogListArray)
   // Progress Column
   progressList.textContent = ''
   progressListArray.forEach((progressItem, index) => {
     createItemEl(progressList, 1 , progressItem, index)
   })
-
+  progressListArray = filterArrays(progressListArray)
   // Complete Column
   completeList.textContent = ''
   completeListArray.forEach((completeItem, index) => {
     createItemEl(completeList, 2, completeItem, index)
   })
-
+  completeListArray = filterArrays(completeListArray)
   // On Hold Column
   onHoldList.textContent = ''
   onHoldListArray.forEach((onHoldItem, index) => {
     createItemEl(onHoldList, 3, onHoldItem, index)
   })
-
+  onHoldListArray = filterArrays(onHoldListArray)
   // Run getSavedColumns only once, Update Local Storage
   updatedOnLoad = true
   updateSavedColumns()
@@ -106,14 +108,16 @@ function updateDOM() {
 // Update Item - Delete if necessary, or update Array value
 const updateItem = (id, column) => {
   const selectedArray = listArrays[column]
-  console.log(selectedArray)
+  
   const selectedColumnEl = listColumns[column].children
-  console.log(selectedColumnEl[id].textContent)
+  if(!selectedColumnEl[id].textContent) {
+    delete selectedArray[id]
+  }
+  updateDOM()
 }
 
 // Add to Column List, Reset Textbox
 const addToColumn = (column) => {
-  console.log(addItems[column].textContent)
   const itemText = addItems[column].textContent
   const selectedArray = listArrays[column]
   selectedArray.push(itemText)
@@ -138,8 +142,6 @@ const hideInputBox = (column) => {
 
 // Allow arrays to reflect Drag and Drop Items
 const rebuildArrays = () => {
-  // console.log(backlogList.children)
-  // console.log(progressList.children)
   backlogListArray = []
   progressListArray = []
   completeListArray = []
@@ -163,7 +165,6 @@ const rebuildArrays = () => {
 // When Item Starts Dragging
 const drag = (e) => {
   draggedItem = e.target
-  // console.log(draggedItem)
 }
 
 // When Ittem Enters Column
